@@ -306,3 +306,34 @@ print("mean_squared_error:", mean_squared_error(y_test, y_predicted_abr))
 # 4
 print("err", y_predicted_abr-y_test)
 
+
+
+
+# moving window model
+
+errorList = np.array([])
+accuracyList =  np.array([])
+trainYears = np.arange(2000,2018,1)
+testYears = trainYears + 1
+for i in trainYears:
+    trainDf = df_2.loc[df_2['Year'] <= i]
+    testDf =  df_2.loc[df_2['Year'] == i+1]
+    
+    X_train = trainDf.drop(['Sales'],axis=1)
+    y_train = trainDf['Sales']
+    
+    X_test = testDf.drop(['Sales'],axis=1)
+    y_test = testDf['Sales']
+    
+    gbr = GradientBoostingRegressor(max_depth=10, random_state=2)
+    gbr.fit(X_train,y_train)
+    
+    yp = gbr.predict(X_test)
+    
+    errorList = np.append(errorList, np.sqrt(mean_squared_error(y_test,yp)))
+    accuracyList = np.append(accuracyList, r2_score(y_test,yp))
+    
+plt.plot(testYears,accuracyList)
+plt.xlabel('Years')
+plt.ylabel('Accuracy')
+plt.xticks(np.arange(2001,2018,2))
